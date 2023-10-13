@@ -1,0 +1,27 @@
+# Maintainer: Yo'av Moshe <archlinux@yoavmoshe.com>
+pkgname=wttrbar
+pkgver=0.4.0
+pkgrel=0
+pkgdesc="Weather indicator for Waybar"
+url="https://github.com/bjesus/wttrbar"
+arch=("any")
+license=("MIT")
+makedepends=('rust')
+source=("source-$pkgver.tar.gz::https://github.com/bjesus/$pkgname/archive/refs/tags/$pkgver.tar.gz")
+sha512sums=('620886f75d1cfaef3b03d46e1891f954f3385806c53dd20449f0483b6a0b9dcff01e6777e8a4fce3025861b6251e60d8635a57cb0df8b15df17ce5595f284754')
+
+prepare() {
+    mv $pkgname-$pkgver/* .
+    cargo fetch --locked --target "$CARCH-unknown-linux-gnu"
+}
+
+build() {
+    export RUSTUP_TOOLCHAIN=stable
+    export CARGO_TARGET_DIR=target
+    cargo build --frozen --release --all-features
+}
+
+package() {
+    install -Dm0755 -t "$pkgdir/usr/bin/" "target/release/$pkgname"
+}
+
